@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>img-brush</title>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.3/lib/p5.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:sans-serif;
+}
+
+#ui{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:white;
+  padding:10px;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+</style>
+
+</head>
+<body>
+
+<div id="ui">
+<input type="file" id="imageUpload"><br><br>
+
+<button id="pngBtn">export PNG</button>
+<button id="jpgBtn">export JPG</button><br><br>
+
+<input type="text" id="bgColor" value="#ffffff">
+<button id="setBg">set background</button>
+</div>
+
+<script>
+
+let brushImg = null;
+let brushSize = 60;
+let canvas;
+let bgColor = "#ffffff";
+
+function setup() {
+
+  canvas = createCanvas(window.innerWidth, window.innerHeight);
+  canvas.position(0,0);
+  canvas.style('z-index','-1');
+
+  background(bgColor);
+
+  // Upload image
+  document.getElementById("imageUpload").addEventListener("change", e=>{
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(event){
+      brushImg = loadImage(event.target.result);
+    }
+
+    reader.readAsDataURL(file);
+  });
+
+  // Export buttons
+  document.getElementById("pngBtn").onclick = ()=>saveCanvas(canvas,"drawing","png");
+  document.getElementById("jpgBtn").onclick = ()=>saveCanvas(canvas,"drawing","jpg");
+
+  // Background color
+  document.getElementById("setBg").onclick = ()=>{
+    bgColor = document.getElementById("bgColor").value;
+    background(bgColor);
+  }
+
+}
+
+function draw(){
+
+  if(mouseIsPressed && brushImg){
+    imageMode(CENTER);
+    image(brushImg, mouseX, mouseY, brushSize, brushSize);
+  }
+
+}
+
+// Brush size with mouse wheel
+function mouseWheel(event){
+  brushSize += event.delta * -0.05;
+  brushSize = constrain(brushSize,10,300);
+}
+
+</script>
+
+</body>
+</html>
